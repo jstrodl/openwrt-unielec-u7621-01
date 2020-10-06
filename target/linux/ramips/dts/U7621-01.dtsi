@@ -44,28 +44,43 @@
 	chosen {
 		bootargs = "console=ttyS0,57600";
 	};
+
+	gpio-keys-polled {
+		compatible = "gpio-keys-polled";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		poll-interval = <20>;
+
+		reset {
+			label = "reset";
+			gpios = <&gpio0 18 GPIO_ACTIVE_LOW>;
+			linux,code = <KEY_RESTART>;
+		};
+	};
+};
+
+&gpio0 {
+	status = "okay";
 };
 
 &pcie {
 	status = "okay";
 
 	pcie0 {
-		mt76@0,0 {
+		mt76@14c3,7603 {
+			compatible = "pci14c3,7603";
 			reg = <0x0000 0 0 0 0>;
 			mediatek,mtd-eeprom = <&factory 0x0000>;
+			ieee80211-freq-limit = <2400000 2500000>;
 		};
 	};
 
 	pcie1 {
-		mt76@0,0 {
+		mt76@14c3,7662 {
+			compatible = "pci14c3,7662";
 			reg = <0x0000 0 0 0 0>;
 			mediatek,mtd-eeprom = <&factory 0x8000>;
 			ieee80211-freq-limit = <5000000 6000000>;
-
-			led {
-				led-sources = <2>;
-				led-active-low;
-			};
 		};
 	};
 };
@@ -74,3 +89,13 @@
 	mtd-mac-address = <&factory 0xe000>;
 	mediatek,portmap = "llllw";
 };
+
+&pinctrl {
+	state_default: pinctrl0 {
+		gpio {
+			ralink,group = "jtag", "uart2", "wdt";
+			ralink,function = "gpio";
+		};
+	};
+};
+
